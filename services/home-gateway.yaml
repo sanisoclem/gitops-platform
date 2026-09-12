@@ -1,0 +1,36 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: home-wildcard-tls
+  namespace: nginx-gateway
+spec:
+  secretName: home-wildcard-tls
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.placeholder"
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: home
+  namespace: nginx-gateway
+spec:
+  gatewayClassName: nginx
+  infrastructure:
+    annotations:
+      metallb.universe.tf/loadBalancerIPs: placeholder
+  listeners:
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.placeholder"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: home-wildcard-tls
+      allowedRoutes:
+        namespaces:
+          from: All

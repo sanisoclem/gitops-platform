@@ -1,0 +1,37 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "argocd": {
+    "managerFilePatterns": ["/^infra/.+\\.yaml$/"]
+  },
+  "kubernetes": {
+    "managerFilePatterns": ["/^services/.+\\.yaml$/"]
+  },
+  "packageRules": [
+    {
+      "description": "Chart versions are pinned, so every change should be a deliberate PR",
+      "matchManagers": ["argocd"],
+      "rangeStrategy": "pin"
+    },
+    {
+      "description": "Observability moves together or not at all",
+      "matchPackageNames": ["kube-prometheus-stack", "loki", "tempo", "alloy"],
+      "groupName": "observability"
+    },
+    {
+      "description": "The gateway and its vendored Gateway API CRDs are one upgrade",
+      "matchPackageNames": ["nginx-gateway-fabric", "nginx/nginx-gateway-fabric"],
+      "groupName": "nginx-gateway-fabric"
+    },
+    {
+      "description": "Anything that can take the cluster down waits for a human",
+      "matchPackageNames": ["cert-manager", "external-secrets", "cloudnative-pg", "democratic-csi", "metallb"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}

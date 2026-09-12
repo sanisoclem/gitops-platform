@@ -5,6 +5,9 @@ metadata:
   namespace: nginx-gateway
 spec:
   gatewayClassName: nginx
+  infrastructure:
+    annotations:
+      metallb.universe.tf/loadBalancerIPs: placeholder
   listeners:
     - name: https
       port: 443

@@ -8,11 +8,13 @@ resources:
   - letsencrypt-issuer.yaml
   - pool.yaml
   - gateway.yaml
+  - home-gateway.yaml
   - kafka
   - redis
   - zitadel
   - argocd
   - monitoring
+  - renovate
 
 patches:
   - target:
@@ -64,6 +66,9 @@ replacements:
     targets:
       - select:
           kind: Certificate
+        reject:
+          - kind: Certificate
+            name: home-wildcard-tls
         fieldPaths:
           - spec.dnsNames.0
         options:
@@ -89,6 +94,50 @@ replacements:
           name: zitadel
         fieldPaths:
           - spec.template.spec.containers.[name=zitadel].env.[name=ZITADEL_EXTERNALDOMAIN].value
+        options:
+          delimiter: '.'
+          index: 1
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.GATEWAY_IP
+    targets:
+      - select:
+          kind: Gateway
+          name: gateway
+        fieldPaths:
+          - spec.infrastructure.annotations.metallb\.universe\.tf/loadBalancerIPs
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.HOME_GATEWAY_IP
+    targets:
+      - select:
+          kind: Gateway
+          name: home
+        fieldPaths:
+          - spec.infrastructure.annotations.metallb\.universe\.tf/loadBalancerIPs
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.HOME_ZONE
+    targets:
+      - select:
+          kind: Certificate
+          name: home-wildcard-tls
+        fieldPaths:
+          - spec.dnsNames.0
+        options:
+          delimiter: '.'
+          index: 1
+      - select:
+          kind: Gateway
+          name: home
+        fieldPaths:
+          - spec.listeners.0.hostname
         options:
           delimiter: '.'
           index: 1

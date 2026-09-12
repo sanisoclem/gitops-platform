@@ -7,7 +7,7 @@ spec:
   instances: 3
 
   storage:
-    storageClass: local
+    storageClass: database
     size: 20Gi
 
   bootstrap:

@@ -11,6 +11,8 @@ data:
 
   DNS_ZONE: placeholder
   GATEWAY_IP: placeholder
+  HOME_GATEWAY_IP: placeholder
+  HOME_ZONE: placeholder
   METALLB_POOL: placeholder
   GITHUB_ORG: placeholder
   LETSENCRYPT_EMAIL: placeholder

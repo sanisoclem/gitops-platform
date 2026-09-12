@@ -16,7 +16,7 @@ spec:
     helm:
       valuesObject:
         storageClass:
-          name: local
+          name: database
           defaultClass: false
           reclaimPolicy: Retain
         nodePathMap:

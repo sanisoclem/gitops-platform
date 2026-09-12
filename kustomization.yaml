@@ -87,17 +87,6 @@ replacements:
   - source:
       kind: ConfigMap
       name: cluster-config
-      fieldPath: data.GATEWAY_IP
-    targets:
-      - select:
-          kind: Application
-          name: nginx-gateway-fabric
-        fieldPaths:
-          - spec.source.helm.valuesObject.service.annotations.metallb\.universe\.tf/loadBalancerIPs
-
-  - source:
-      kind: ConfigMap
-      name: cluster-config
       fieldPath: data.DNS_ZONE
     targets:
       - select:

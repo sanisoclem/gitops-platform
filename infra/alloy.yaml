@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://grafana.github.io/helm-charts
     chart: alloy
-    targetRevision: "1.x"
+    targetRevision: 1.12.1
     helm:
       valuesObject:
         controller:
