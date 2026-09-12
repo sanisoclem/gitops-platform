@@ -31,6 +31,7 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true
         retry:
           limit: 20
           backoff:
@@ -38,6 +39,11 @@ spec:
             factor: 2
             maxDuration: 5m
       ignoreDifferences:
+        - group: ''
+          kind: PersistentVolumeClaim
+          jsonPointers:
+            - /spec/volumeName
+            - /spec/storageClassName
         - group: apps
           kind: Deployment
           jqPathExpressions:
@@ -77,9 +83,16 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true
         retry:
           limit: 20
           backoff:
             duration: 15s
             factor: 2
             maxDuration: 5m
+      ignoreDifferences:
+        - group: ''
+          kind: PersistentVolumeClaim
+          jsonPointers:
+            - /spec/volumeName
+            - /spec/storageClassName
