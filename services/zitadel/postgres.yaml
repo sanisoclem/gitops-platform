@@ -12,10 +12,17 @@ spec:
 
   bootstrap:
     initdb:
-      database: zitadel
-      owner: zitadel
-      secret:
-        name: zitadel-db-app
+      database: app
+      owner: app
+
+  managed:
+    roles:
+      - name: zitadel
+        ensure: present
+        login: true
+        superuser: true
+        passwordSecret:
+          name: zitadel-db-app
 
 
   monitoring:
@@ -53,3 +60,14 @@ spec:
   backupOwnerReference: self
   cluster:
     name: zitadel-db
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: zitadel
+  namespace: zitadel
+spec:
+  cluster:
+    name: zitadel-db
+  name: zitadel
+  owner: zitadel
