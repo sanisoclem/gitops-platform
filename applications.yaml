@@ -39,11 +39,6 @@ spec:
             factor: 2
             maxDuration: 5m
       ignoreDifferences:
-        - group: ''
-          kind: PersistentVolumeClaim
-          jsonPointers:
-            - /spec/volumeName
-            - /spec/storageClassName
         - group: apps
           kind: Deployment
           jqPathExpressions:
@@ -90,9 +85,3 @@ spec:
             duration: 15s
             factor: 2
             maxDuration: 5m
-      ignoreDifferences:
-        - group: ''
-          kind: PersistentVolumeClaim
-          jsonPointers:
-            - /spec/volumeName
-            - /spec/storageClassName
