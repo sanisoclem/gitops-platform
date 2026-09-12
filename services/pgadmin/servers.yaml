@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgadmin-servers
+  namespace: pgadmin
+data:
+  servers.json: |
+    {
+      "Servers": {
+        "1": {
+          "Name": "hempire prod",
+          "Group": "hempire",
+          "Host": "hempire-db-rw.env-prod.svc.cluster.local",
+          "Port": 5432,
+          "MaintenanceDB": "postgres",
+          "Username": "hempire",
+          "SSLMode": "prefer",
+          "PassFile": "/pgpass",
+          "Shared": true
+        },
+        "2": {
+          "Name": "hempire test",
+          "Group": "hempire",
+          "Host": "hempire-db-rw.env-test.svc.cluster.local",
+          "Port": 5432,
+          "MaintenanceDB": "postgres",
+          "Username": "hempire",
+          "SSLMode": "prefer",
+          "PassFile": "/pgpass",
+          "Shared": true
+        },
+        "3": {
+          "Name": "zitadel",
+          "Group": "platform",
+          "Host": "zitadel-db-rw.zitadel.svc.cluster.local",
+          "Port": 5432,
+          "MaintenanceDB": "zitadel",
+          "Username": "zitadel",
+          "SSLMode": "prefer",
+          "PassFile": "/pgpass",
+          "Shared": true
+        },
+        "4": {
+          "Name": "immich",
+          "Group": "home",
+          "Host": "postgres-rw.home-services.svc.cluster.local",
+          "Port": 5432,
+          "MaintenanceDB": "immich",
+          "Username": "immich",
+          "SSLMode": "prefer",
+          "PassFile": "/pgpass",
+          "Shared": true
+        },
+        "5": {
+          "Name": "paperless",
+          "Group": "home",
+          "Host": "postgres-rw.home-services.svc.cluster.local",
+          "Port": 5432,
+          "MaintenanceDB": "paperless",
+          "Username": "paperless",
+          "SSLMode": "prefer",
+          "PassFile": "/pgpass",
+          "Shared": true
+        }
+      }
+    }
