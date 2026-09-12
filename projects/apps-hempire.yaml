@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: apps-hempire
+  namespace: argocd
+spec:
+  description: The hempire application environments
+  sourceRepos:
+    - placeholder
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: 'env-*'
+  clusterResourceWhitelist: []
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

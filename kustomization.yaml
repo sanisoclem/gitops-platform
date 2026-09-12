@@ -1,0 +1,110 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - config
+  - projects
+  - platform.yaml
+  - applications.yaml
+  - infra
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: cluster-config
+      fieldPath: data.repoURL
+    targets:
+      - select:
+          kind: Application
+          labelSelector: app.kubernetes.io/component=bootstrap
+        fieldPaths:
+          - spec.source.repoURL
+      - select:
+          kind: Application
+          name: cluster-services
+        fieldPaths:
+          - spec.source.repoURL
+      - select:
+          kind: AppProject
+          name: cluster-services
+        fieldPaths:
+          - spec.sourceRepos.0
+
+  - source:
+      kind: ConfigMap
+      name: cluster-config
+      fieldPath: data.targetRevision
+    targets:
+      - select:
+          kind: Application
+          labelSelector: app.kubernetes.io/component=bootstrap
+        fieldPaths:
+          - spec.source.targetRevision
+      - select:
+          kind: Application
+          name: cluster-services
+        fieldPaths:
+          - spec.source.targetRevision
+      - select:
+          kind: ApplicationSet
+        fieldPaths:
+          - spec.generators.0.git.revision
+          - spec.template.spec.source.targetRevision
+
+  - source:
+      kind: ConfigMap
+      name: cluster-config
+      fieldPath: data.hempireRepoURL
+    targets:
+      - select:
+          kind: ApplicationSet
+          name: hempire
+        fieldPaths:
+          - spec.generators.0.git.repoURL
+          - spec.template.spec.source.repoURL
+      - select:
+          kind: AppProject
+          name: apps-hempire
+        fieldPaths:
+          - spec.sourceRepos.0
+
+  - source:
+      kind: ConfigMap
+      name: cluster-config
+      fieldPath: data.homeRepoURL
+    targets:
+      - select:
+          kind: ApplicationSet
+          name: home
+        fieldPaths:
+          - spec.generators.0.git.repoURL
+          - spec.template.spec.source.repoURL
+      - select:
+          kind: AppProject
+          name: apps-home
+        fieldPaths:
+          - spec.sourceRepos.0
+
+  - source:
+      kind: ConfigMap
+      name: cluster-config
+      fieldPath: data.GATEWAY_IP
+    targets:
+      - select:
+          kind: Application
+          name: nginx-gateway-fabric
+        fieldPaths:
+          - spec.source.helm.valuesObject.service.annotations.metallb\.universe\.tf/loadBalancerIPs
+
+  - source:
+      kind: ConfigMap
+      name: cluster-config
+      fieldPath: data.DNS_ZONE
+    targets:
+      - select:
+          kind: Application
+          name: kube-prometheus-stack
+        fieldPaths:
+          - spec.source.helm.valuesObject.grafana.grafana\.ini.server.root_url
+        options:
+          delimiter: '.'
+          index: 1

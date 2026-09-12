@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-insight
+  namespace: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-insight
+  template:
+    metadata:
+      labels:
+        app: redis-insight
+    spec:
+      containers:
+        - name: redis-insight
+          image: docker.io/redis/redisinsight:3.6.0
+          env:
+            - name: RI_ACCEPT_TERMS_AND_CONDITIONS
+              value: "true"
+            - name: RI_SERVER_TLS_CERT
+              value: /certs/tls.crt
+            - name: RI_SERVER_TLS_KEY
+              value: /certs/tls.key
+            - name: RI_REDIS_HOST
+              value: redis.redis.svc.cluster.local
+            - name: RI_REDIS_PORT
+              value: "6379"
+            - name: RI_REDIS_ALIAS
+              value: redis
+          ports:
+            - containerPort: 5540
+              name: https
+          volumeMounts:
+            - name: tls
+              mountPath: /certs
+              readOnly: true
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            tcpSocket:
+              port: 5540
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128Mi
+            limits:
+              memory: 384Mi
+      volumes:
+        - name: tls
+          secret:
+            secretName: redis-insight-tls
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-insight
+  namespace: redis
+spec:
+  selector:
+    app: redis-insight
+  ports:
+    - name: https
+      port: 443
+      targetPort: 5540
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: redis-insight-tls
+  namespace: redis
+spec:
+  secretName: redis-insight-tls
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  dnsNames:
+    - redis.placeholder
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: redis-insight
+  namespace: redis
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: gateway
+      namespace: nginx-gateway
+      sectionName: https
+  hostnames:
+    - redis.placeholder
+  rules:
+    - backendRefs:
+        - group: ''
+          kind: Service
+          name: redis-insight
+          port: 443
+          weight: 1

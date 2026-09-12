@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: hempire
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: placeholder
+        revision: placeholder
+        directories:
+          - path: envs/*
+  template:
+    metadata:
+      name: 'hempire-{{path.basename}}'
+      namespace: argocd
+      labels:
+        hempire.money/app-type: env
+    spec:
+      project: apps-hempire
+      source:
+        repoURL: placeholder
+        targetRevision: placeholder
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'env-{{path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 20
+          backoff:
+            duration: 15s
+            factor: 2
+            maxDuration: 5m
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jqPathExpressions:
+            - '.spec.template.spec.containers[] | select(.name == "traffic-agent")'
+            - '.spec.template.spec.initContainers[] | select(.name == "tel-agent-init")'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: home
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: placeholder
+        revision: placeholder
+        directories:
+          - path: envs/*
+  template:
+    metadata:
+      name: 'home-{{path.basename}}'
+      namespace: argocd
+      labels:
+        hempire.money/app-type: env
+    spec:
+      project: apps-home
+      source:
+        repoURL: placeholder
+        targetRevision: placeholder
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'home-{{path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 20
+          backoff:
+            duration: 15s
+            factor: 2
+            maxDuration: 5m

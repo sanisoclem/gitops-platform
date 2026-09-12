@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-config
+  namespace: argocd
+data:
+  repoURL: https://github.com/sanisoclem/gitops-platform.git
+  targetRevision: main
+  hempireRepoURL: https://github.com/Saline-Pty-Ltd/gitops.git
+  homeRepoURL: https://github.com/sanisoclem/gitops-home.git
+
+  DNS_ZONE: placeholder
+  GATEWAY_IP: placeholder
+  METALLB_POOL: placeholder
+  GITHUB_ORG: placeholder
+  LETSENCRYPT_EMAIL: placeholder
+  ZITADEL_URL: placeholder
+  AUTH_JWKS_URI: placeholder
+
+  S3_ENDPOINT: placeholder

@@ -1,0 +1,33 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: democratic-csi-iscsi
+  namespace: democratic-csi
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: cluster-secrets
+    kind: ClusterSecretStore
+  target:
+    name: democratic-csi-iscsi
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: democratic-csi-iscsi
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: democratic-csi-nfs
+  namespace: democratic-csi
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: cluster-secrets
+    kind: ClusterSecretStore
+  target:
+    name: democratic-csi-nfs
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: democratic-csi-nfs

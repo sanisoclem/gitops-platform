@@ -1,0 +1,94 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../config
+  - nginx-gateway-namespace.yaml
+  - clustersecretstore.yaml
+  - democratic-csi-config.yaml
+  - letsencrypt-issuer.yaml
+  - pool.yaml
+  - gateway.yaml
+  - kafka
+  - redis
+  - zitadel
+  - argocd
+  - monitoring
+
+patches:
+  - target:
+      kind: ConfigMap
+      name: cluster-config
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: cluster-services-config
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.LETSENCRYPT_EMAIL
+    targets:
+      - select:
+          kind: ClusterIssuer
+          name: letsencrypt
+        fieldPaths:
+          - spec.acme.email
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.METALLB_POOL
+    targets:
+      - select:
+          kind: IPAddressPool
+          name: cluster
+        fieldPaths:
+          - spec.addresses.0
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.S3_ENDPOINT
+    targets:
+      - select:
+          kind: Cluster
+          name: zitadel-db
+        fieldPaths:
+          - spec.backup.barmanObjectStore.endpointURL
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.DNS_ZONE
+    targets:
+      - select:
+          kind: Certificate
+        fieldPaths:
+          - spec.dnsNames.0
+        options:
+          delimiter: '.'
+          index: 1
+      - select:
+          kind: TLSRoute
+        fieldPaths:
+          - spec.hostnames.0
+        options:
+          delimiter: '.'
+          index: 1
+      - select:
+          kind: ConfigMap
+          name: argocd-cm
+        fieldPaths:
+          - data.url
+        options:
+          delimiter: '.'
+          index: 1
+      - select:
+          kind: Deployment
+          name: zitadel
+        fieldPaths:
+          - spec.template.spec.containers.[name=zitadel].env.[name=ZITADEL_EXTERNALDOMAIN].value
+        options:
+          delimiter: '.'
+          index: 1

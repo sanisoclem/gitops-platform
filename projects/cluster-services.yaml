@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cluster-services
+  namespace: argocd
+spec:
+  description: The platform — CRDs, storage, ingress, policy, secrets, observability, identity
+  sourceRepos:
+    - placeholder
+    - ghcr.io/nginx/charts
+    - ghcr.io/telepresenceio
+    - https://charts.external-secrets.io
+    - https://charts.jetstack.io
+    - https://cloudnative-pg.github.io/charts
+    - https://democratic-csi.github.io/charts/
+    - https://github.com/kubernetes-sigs/gateway-api
+    - https://github.com/rancher/local-path-provisioner
+    - https://grafana.github.io/helm-charts
+    - https://kubernetes-sigs.github.io/metrics-server/
+    - https://kyverno.github.io/kyverno/
+    - https://metallb.github.io/metallb
+    - https://prometheus-community.github.io/helm-charts
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: telepresence
+  namespace: argocd
+  labels:
+    hempire.money/app-type: cluster-infra
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: cluster-services
+  source:
+    repoURL: ghcr.io/telepresenceio
+    chart: telepresence-oss
+    targetRevision: "2.29.3"
+    helm:
+      valuesObject:
+        namespaces:
+          - env-test
+        usage:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ambassador
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

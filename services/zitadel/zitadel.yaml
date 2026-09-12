@@ -1,0 +1,182 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zitadel
+  namespace: zitadel
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: zitadel
+  template:
+    metadata:
+      labels:
+        app: zitadel
+    spec:
+      enableServiceLinks: false
+      containers:
+        - name: zitadel
+          image: ghcr.io/zitadel/zitadel:v2.54.3
+          args:
+            - start-from-init
+            - --masterkeyFromEnv
+            - --tlsMode
+            - enabled
+          env:
+            - name: ZITADEL_MASTERKEY
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-secrets
+                  key: masterkey
+            - name: ZITADEL_DATABASE_POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-secrets
+                  key: db-host
+            - name: ZITADEL_DATABASE_POSTGRES_PORT
+              value: "5432"
+            - name: ZITADEL_DATABASE_POSTGRES_DATABASE
+              value: zitadel
+            - name: ZITADEL_DATABASE_POSTGRES_USER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-secrets
+                  key: db-user
+            - name: ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-secrets
+                  key: db-password
+            - name: ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
+              value: require
+            - name: ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-secrets
+                  key: db-user
+            - name: ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-secrets
+                  key: db-password
+            - name: ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
+              value: require
+            - name: ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
+              value: "10"
+            - name: ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
+              value: "5"
+            - name: ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
+              value: 30m
+            - name: ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
+              value: 5m
+            - name: ZITADEL_EXTERNALSECURE
+              value: "true"
+            - name: ZITADEL_EXTERNALPORT
+              value: "443"
+            - name: ZITADEL_EXTERNALDOMAIN
+              value: a.placeholder
+            - name: ZITADEL_TLS_ENABLED
+              value: "true"
+            - name: ZITADEL_TLS_CERTPATH
+              value: /certs/tls.crt
+            - name: ZITADEL_TLS_KEYPATH
+              value: /certs/tls.key
+            - name: ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME
+              value: gitops-automation
+            - name: ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME
+              value: gitops-automation
+            - name: ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE
+              value: "2099-01-01T00:00:00Z"
+            - name: ZITADEL_FIRSTINSTANCE_PATPATH
+              value: /pat/token
+            - name: ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-secrets
+                  key: admin-password
+            - name: ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED
+              value: "false"
+          ports:
+            - containerPort: 8080
+              name: https
+          volumeMounts:
+            - name: tls
+              mountPath: /certs
+              readOnly: true
+            - name: pat
+              mountPath: /pat
+          resources:
+            requests:
+              cpu: 25m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+        - name: pat-reader
+          image: docker.io/library/busybox:1.36
+          command: ["sleep", "infinity"]
+          volumeMounts:
+            - name: pat
+              mountPath: /pat
+              readOnly: true
+          resources:
+            requests:
+              cpu: 1m
+              memory: 4Mi
+            limits:
+              memory: 16Mi
+      volumes:
+        - name: tls
+          secret:
+            secretName: zitadel-tls
+        - name: pat
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zitadel
+  namespace: zitadel
+spec:
+  selector:
+    app: zitadel
+  ports:
+    - port: 443
+      targetPort: 8080
+      name: https
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: zitadel-tls
+  namespace: zitadel
+spec:
+  secretName: zitadel-tls
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  dnsNames:
+    - a.placeholder
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: zitadel
+  namespace: zitadel
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: gateway
+      namespace: nginx-gateway
+      sectionName: https
+  hostnames:
+    - a.placeholder
+  rules:
+    - backendRefs:
+        - group: ''
+          kind: Service
+          name: zitadel
+          port: 443
+          weight: 1

@@ -1,0 +1,195 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+  labels:
+    hempire.money/app-type: cluster-infra
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: cluster-services
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: "87.x"
+    helm:
+      valuesObject:
+        alertmanager:
+          enabled: false
+        kubeControllerManager:
+          enabled: false
+        kubeScheduler:
+          enabled: false
+        kubeProxy:
+          enabled: false
+        kubeEtcd:
+          enabled: false
+        defaultRules:
+          rules:
+            alertmanager: false
+            etcd: false
+            kubeControllerManager: false
+            kubeProxy: false
+            kubeSchedulerAlerting: false
+            kubeSchedulerRecording: false
+            windows: false
+        prometheusOperator:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 192Mi
+        kube-state-metrics:
+          resources:
+            requests:
+              cpu: 5m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+        prometheus-node-exporter:
+          resources:
+            requests:
+              cpu: 5m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+        prometheus:
+          prometheusSpec:
+            retention: 7d
+            retentionSize: 7GB
+            enableRemoteWriteReceiver: true
+            enableOTLPReceiver: true
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 8Gi
+            resources:
+              requests:
+                cpu: 100m
+                memory: 1Gi
+              limits:
+                memory: 3Gi
+        grafana:
+          admin:
+            existingSecret: grafana-admin
+          envFromSecret: grafana-oidc
+          persistence:
+            enabled: true
+            size: 2Gi
+          deploymentStrategy:
+            type: Recreate
+          extraSecretMounts:
+            - name: grafana-tls
+              secretName: grafana-tls
+              mountPath: /etc/grafana/tls
+              readOnly: true
+          service:
+            port: 443
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+              scheme: HTTPS
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+              scheme: HTTPS
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 10
+          serviceMonitor:
+            scheme: https
+            tlsConfig:
+              insecureSkipVerify: true
+          testFramework:
+            enabled: false
+          resources:
+            requests:
+              cpu: 25m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          sidecar:
+            resources:
+              requests:
+                cpu: 5m
+                memory: 48Mi
+              limits:
+                memory: 128Mi
+            dashboards:
+              reloadURL: https://localhost:3000/api/admin/provisioning/dashboards/reload
+              env:
+                REQ_SKIP_TLS_VERIFY: "true"
+            datasources:
+              reloadURL: https://localhost:3000/api/admin/provisioning/datasources/reload
+              env:
+                REQ_SKIP_TLS_VERIFY: "true"
+              alertmanager:
+                enabled: false
+          grafana.ini:
+            analytics:
+              check_for_updates: false
+            server:
+              protocol: https
+              cert_file: /etc/grafana/tls/tls.crt
+              cert_key: /etc/grafana/tls/tls.key
+              root_url: https://grafana.placeholder
+            auth.github:
+              enabled: true
+              name: GitHub
+              allow_sign_up: true
+              scopes: user:email,read:org
+              auth_url: https://github.com/login/oauth/authorize
+              token_url: https://github.com/login/oauth/access_token
+              api_url: https://api.github.com/user
+              allowed_organizations: Saline-Pty-Ltd
+            users:
+              auto_assign_org_role: Admin
+          additionalDataSources:
+            - name: Loki
+              type: loki
+              uid: loki
+              access: proxy
+              url: http://loki.monitoring.svc.cluster.local:3100
+              jsonData:
+                derivedFields:
+                  - name: TraceID
+                    matcherRegex: '(?:trace_?[iI][dD])[":=\s]+([0-9a-fA-F]{16,32})'
+                    url: '${__value.raw}'
+                    datasourceUid: tempo
+            - name: Tempo
+              type: tempo
+              uid: tempo
+              access: proxy
+              url: http://tempo.monitoring.svc.cluster.local:3200
+              jsonData:
+                tracesToLogsV2:
+                  datasourceUid: loki
+                  spanStartTimeShift: '-5m'
+                  spanEndTimeShift: '5m'
+                  filterByTraceID: true
+                  tags:
+                    - key: service.name
+                      value: app
+                serviceMap:
+                  datasourceUid: prometheus
+                nodeGraph:
+                  enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
