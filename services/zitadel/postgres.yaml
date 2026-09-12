@@ -4,7 +4,7 @@ metadata:
   name: zitadel-db
   namespace: zitadel
 spec:
-  instances: 3
+  instances: 1
 
   storage:
     storageClass: database
@@ -17,9 +17,6 @@ spec:
       secret:
         name: zitadel-db-app
 
-  affinity:
-    enablePodAntiAffinity: true
-    topologyKey: kubernetes.io/hostname
 
   monitoring:
     enablePodMonitor: true
@@ -27,7 +24,7 @@ spec:
   backup:
     retentionPolicy: 30d
     barmanObjectStore:
-      destinationPath: s3://cnpg/zitadel
+      destinationPath: s3://backups/zitadel
       endpointURL: placeholder
       s3Credentials:
         accessKeyId:
