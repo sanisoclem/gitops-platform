@@ -4,4 +4,5 @@ resources:
   - namespace.yaml
   - externalsecret.yaml
   - servers.yaml
+  - hooks.yaml
   - pgadmin.yaml

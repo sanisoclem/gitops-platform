@@ -73,6 +73,11 @@ spec:
               value: /pgadmin4/servers.json
             - name: PGPASS_FILE
               value: /pgpass
+            - name: INSTANCE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pgadmin
+                  key: password
           ports:
             - containerPort: 8443
               name: https
@@ -83,6 +88,9 @@ spec:
             - name: servers
               mountPath: /pgadmin4/servers.json
               subPath: servers.json
+              readOnly: true
+            - name: hooks
+              mountPath: /hooks
               readOnly: true
             - name: secret
               mountPath: /pgadmin4/config_local.py
@@ -117,6 +125,10 @@ spec:
         - name: servers
           configMap:
             name: pgadmin-servers
+        - name: hooks
+          configMap:
+            name: pgadmin-hooks
+            defaultMode: 0555
         - name: secret
           secret:
             secretName: pgadmin
