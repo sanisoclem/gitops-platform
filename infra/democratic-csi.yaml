@@ -31,9 +31,6 @@ spec:
               fsType: ext4
         node:
           hostPID: true
-          driver:
-            iscsiDirHostPath: /var/lib/iscsi
-            iscsiDirHostPathType: Directory
   destination:
     server: https://kubernetes.default.svc
     namespace: democratic-csi
