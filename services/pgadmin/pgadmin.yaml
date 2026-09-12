@@ -42,12 +42,14 @@ spec:
               value: "true"
             - name: PGADMIN_ENABLE_TLS
               value: "True"
+            - name: PGADMIN_LISTEN_PORT
+              value: "8443"
             - name: PGADMIN_SERVER_JSON_FILE
               value: /pgadmin4/servers.json
             - name: PGPASS_FILE
               value: /pgpass
           ports:
-            - containerPort: 443
+            - containerPort: 8443
               name: https
           volumeMounts:
             - name: certs
@@ -69,7 +71,7 @@ spec:
               mountPath: /var/lib/pgadmin
           readinessProbe:
             tcpSocket:
-              port: 443
+              port: 8443
             initialDelaySeconds: 20
             periodSeconds: 10
           resources:
@@ -107,7 +109,7 @@ spec:
   ports:
     - name: https
       port: 443
-      targetPort: 443
+      targetPort: 8443
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
