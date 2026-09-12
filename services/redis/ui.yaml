@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: redis-insight
-          image: docker.io/redis/redisinsight:3.6.0
+          image: docker.io/redis/redisinsight:3.8.0
           env:
             - name: RI_ACCEPT_TERMS_AND_CONDITIONS
               value: "true"
