@@ -22,6 +22,31 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+        - name: seed-pgpass
+          image: docker.io/dpage/pgadmin4:9.17
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              for login in $(tr ',' ' ' < /secret/allowedLogins); do
+                dir="/var/lib/pgadmin/storage/$login"
+                mkdir -p "$dir"
+                cp /secret/pgpass "$dir/.pgpass"
+                chmod 600 "$dir/.pgpass"
+              done
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: secret
+              mountPath: /secret
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/pgadmin
       containers:
         - name: pgadmin
           image: docker.io/dpage/pgadmin4:9.17

@@ -14,8 +14,9 @@ data:
           "Port": 5432,
           "MaintenanceDB": "postgres",
           "Username": "hempire",
+          "SharedUsername": "hempire",
           "SSLMode": "prefer",
-          "PassFile": "/pgpass",
+          "PassFile": "/.pgpass",
           "Shared": true
         },
         "2": {
@@ -25,8 +26,9 @@ data:
           "Port": 5432,
           "MaintenanceDB": "postgres",
           "Username": "hempire",
+          "SharedUsername": "hempire",
           "SSLMode": "prefer",
-          "PassFile": "/pgpass",
+          "PassFile": "/.pgpass",
           "Shared": true
         },
         "3": {
@@ -36,8 +38,9 @@ data:
           "Port": 5432,
           "MaintenanceDB": "zitadel",
           "Username": "zitadel",
+          "SharedUsername": "zitadel",
           "SSLMode": "prefer",
-          "PassFile": "/pgpass",
+          "PassFile": "/.pgpass",
           "Shared": true
         },
         "4": {
@@ -47,8 +50,9 @@ data:
           "Port": 5432,
           "MaintenanceDB": "immich",
           "Username": "immich",
+          "SharedUsername": "immich",
           "SSLMode": "prefer",
-          "PassFile": "/pgpass",
+          "PassFile": "/.pgpass",
           "Shared": true
         },
         "5": {
@@ -58,8 +62,9 @@ data:
           "Port": 5432,
           "MaintenanceDB": "paperless",
           "Username": "paperless",
+          "SharedUsername": "paperless",
           "SSLMode": "prefer",
-          "PassFile": "/pgpass",
+          "PassFile": "/.pgpass",
           "Shared": true
         }
       }
