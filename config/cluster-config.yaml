@@ -9,14 +9,15 @@ data:
   hempireRepoURL: https://github.com/Saline-Pty-Ltd/gitops.git
   homeRepoURL: https://github.com/sanisoclem/gitops-home.git
 
-  DNS_ZONE: placeholder
-  GATEWAY_IP: placeholder
-  HOME_GATEWAY_IP: placeholder
-  HOME_ZONE: placeholder
-  METALLB_POOL: placeholder
-  GITHUB_ORG: placeholder
-  LETSENCRYPT_EMAIL: placeholder
-  ZITADEL_URL: placeholder
-  AUTH_JWKS_URI: placeholder
+  DNS_ZONE: k8s.shokugami.place
+  GATEWAY_IP: 10.11.7.67
+  HOME_GATEWAY_IP: 10.11.7.68
+  HOME_ZONE: svc.k8s.shokugami.place
+  HEMPIRE_ZONE: k8s.hempire.money
+  METALLB_POOL: 10.11.7.67-10.11.7.75
+  GITHUB_ORG: Shokugami
+  LETSENCRYPT_EMAIL: admin@shokugami.place
+  ZITADEL_URL: https://a.k8s.shokugami.place
+  AUTH_JWKS_URI: https://a.k8s.shokugami.place/oauth/v2/keys
 
-  S3_ENDPOINT: placeholder
+  S3_ENDPOINT: http://10.11.7.30:30292

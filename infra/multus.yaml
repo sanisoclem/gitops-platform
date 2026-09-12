@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: multus
+  namespace: argocd
+  labels:
+    hempire.money/app-type: cluster-infra
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: cluster-services
+  source:
+    repoURL: https://github.com/k8snetworkplumbingwg/multus-cni
+    targetRevision: v4.3.1
+    path: deployments
+    directory:
+      include: multus-daemonset-thick.yml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

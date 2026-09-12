@@ -6,6 +6,7 @@ resources:
   - eso.yaml
   - kyverno.yaml
   - metallb.yaml
+  - multus.yaml
   - metrics-server.yaml
   - democratic-csi.yaml
   - local-path-provisioner.yaml

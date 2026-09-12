@@ -141,3 +141,25 @@ replacements:
         options:
           delimiter: '.'
           index: 1
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.DNS_ZONE
+    targets:
+      - select:
+          kind: ClusterIssuer
+          name: letsencrypt
+        fieldPaths:
+          - spec.acme.solvers.0.selector.dnsZones.0
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.HEMPIRE_ZONE
+    targets:
+      - select:
+          kind: ClusterIssuer
+          name: letsencrypt
+        fieldPaths:
+          - spec.acme.solvers.1.selector.dnsZones.0

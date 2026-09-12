@@ -16,4 +16,4 @@ data:
           clientID: $dex.github.clientId
           clientSecret: $dex.github.clientSecret
           orgs:
-            - name: Saline-Pty-Ltd
+            - name: Shokugami

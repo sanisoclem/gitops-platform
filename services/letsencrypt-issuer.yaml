@@ -14,6 +14,17 @@ spec:
             apiTokenSecretRef:
               name: cloudflare-api-token
               key: api-token
+        selector:
+          dnsZones:
+            - placeholder
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token-hempire
+              key: api-token
+        selector:
+          dnsZones:
+            - placeholder
 ---
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
@@ -32,4 +43,23 @@ spec:
     - secretKey: api-token
       remoteRef:
         key: cloudflare
+        property: api-token
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: cloudflare-api-token-hempire
+  namespace: cert-manager
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: cluster-secrets
+    kind: ClusterSecretStore
+  target:
+    name: cloudflare-api-token-hempire
+    creationPolicy: Owner
+  data:
+    - secretKey: api-token
+      remoteRef:
+        key: cloudflare-hempire
         property: api-token
