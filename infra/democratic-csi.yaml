@@ -19,6 +19,8 @@ spec:
           name: org.democratic-csi.iscsi
         driver:
           existingConfigSecret: democratic-csi-iscsi
+          config:
+            driver: freenas-api-iscsi
         storageClasses:
           - name: nas-block
             defaultClass: true
@@ -64,6 +66,8 @@ spec:
           name: org.democratic-csi.nfs
         driver:
           existingConfigSecret: democratic-csi-nfs
+          config:
+            driver: freenas-api-nfs
         storageClasses:
           - name: nas-file
             defaultClass: false
