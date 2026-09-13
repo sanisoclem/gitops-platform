@@ -11,9 +11,24 @@ spec:
     size: 20Gi
 
   bootstrap:
-    initdb:
-      database: app
-      owner: app
+    recovery:
+      source: backup
+
+  externalClusters:
+    - name: backup
+      barmanObjectStore:
+        destinationPath: s3://backups/zitadel
+        endpointURL: placeholder
+        serverName: zitadel-db
+        s3Credentials:
+          accessKeyId:
+            name: s3
+            key: access-key
+          secretAccessKey:
+            name: s3
+            key: secret-key
+        wal:
+          maxParallel: 8
 
   managed:
     roles:

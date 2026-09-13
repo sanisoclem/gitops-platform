@@ -65,6 +65,7 @@ replacements:
           name: zitadel-db
         fieldPaths:
           - spec.backup.barmanObjectStore.endpointURL
+          - spec.externalClusters.0.barmanObjectStore.endpointURL
 
   - source:
       kind: ConfigMap
