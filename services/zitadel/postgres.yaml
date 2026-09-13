@@ -37,7 +37,7 @@ spec:
         login: true
         superuser: true
         passwordSecret:
-          name: zitadel-db-app
+          name: zitadel-db-owner
 
 
   monitoring:
