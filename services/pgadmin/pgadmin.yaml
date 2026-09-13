@@ -23,19 +23,55 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        - name: seed-pgpass
+        - name: seed
           image: docker.io/dpage/pgadmin4:9.17
           command:
             - sh
             - -c
             - |
               set -eu
-              for login in $(tr ',' ' ' < /secret/allowedLogins); do
-                dir="/var/lib/pgadmin/storage/$login"
+              cd /pgadmin4
+
+              seed_pgpass() {
+                dir="/var/lib/pgadmin/storage/$1"
                 mkdir -p "$dir"
                 cp /secret/pgpass "$dir/.pgpass"
                 chmod 600 "$dir/.pgpass"
+              }
+
+              load() {
+                /venv/bin/python3 setup.py load-servers /pgadmin4/servers.json \
+                  --user "$1" --auth-source "$2" --replace
+              }
+
+              if [ ! -f /var/lib/pgadmin/pgadmin4.db ]; then
+                PGADMIN_SETUP_EMAIL="$PGADMIN_DEFAULT_EMAIL" \
+                PGADMIN_SETUP_PASSWORD="$PGADMIN_DEFAULT_PASSWORD" \
+                  /venv/bin/python3 setup.py setup-db
+              fi
+
+              load "$PGADMIN_DEFAULT_EMAIL" internal
+              seed_pgpass "$(echo "$PGADMIN_DEFAULT_EMAIL" | tr '@' '_')"
+
+              for login in $(tr ',' ' ' < /secret/allowedLogins); do
+                /venv/bin/python3 setup.py add-external-user "$login" \
+                  --auth-source oauth2 --admin || true
+                load "$login" oauth2
+                seed_pgpass "$login"
               done
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              value: placeholder
+            - name: PGADMIN_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgadmin
+                  key: password
+            - name: INSTANCE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pgadmin
+                  key: password
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -44,6 +80,17 @@ spec:
           volumeMounts:
             - name: secret
               mountPath: /secret
+              readOnly: true
+            - name: secret
+              mountPath: /pgadmin4/config_local.py
+              subPath: config_local.py
+              readOnly: true
+            - name: servers
+              mountPath: /pgadmin4/servers.json
+              subPath: servers.json
+              readOnly: true
+            - name: hooks
+              mountPath: /hooks
               readOnly: true
             - name: data
               mountPath: /var/lib/pgadmin
