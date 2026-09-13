@@ -48,6 +48,7 @@ spec:
     barmanObjectStore:
       destinationPath: s3://backups/zitadel
       endpointURL: placeholder
+      serverName: zitadel-db-r1
       s3Credentials:
         accessKeyId:
           name: s3
