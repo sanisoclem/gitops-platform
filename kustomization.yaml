@@ -24,6 +24,11 @@ replacements:
         fieldPaths:
           - spec.source.repoURL
       - select:
+          kind: Application
+          name: multus
+        fieldPaths:
+          - spec.source.repoURL
+      - select:
           kind: AppProject
           name: cluster-services
         fieldPaths:
@@ -42,6 +47,11 @@ replacements:
       - select:
           kind: Application
           name: cluster-services
+        fieldPaths:
+          - spec.source.targetRevision
+      - select:
+          kind: Application
+          name: multus
         fieldPaths:
           - spec.source.targetRevision
       - select:

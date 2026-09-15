@@ -10,11 +10,9 @@ metadata:
 spec:
   project: cluster-services
   source:
-    repoURL: https://github.com/k8snetworkplumbingwg/multus-cni
-    targetRevision: v4.3.1
-    path: deployments
-    directory:
-      include: multus-daemonset-thick.yml
+    repoURL: placeholder
+    targetRevision: placeholder
+    path: infra/multus
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
