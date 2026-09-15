@@ -29,7 +29,7 @@ spec:
             fsGroup: 12021
           containers:
             - name: renovate
-              image: ghcr.io/renovatebot/renovate:44.82.3
+              image: ghcr.io/renovatebot/renovate:44.93.5
               env:
                 - name: RENOVATE_PLATFORM
                   value: github
