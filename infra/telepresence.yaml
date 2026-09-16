@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: ghcr.io/telepresenceio
     chart: telepresence-oss
-    targetRevision: "2.29.3"
+    targetRevision: "2.31.2"
     helm:
       valuesObject:
         namespaces:
