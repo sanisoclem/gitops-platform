@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: seed
-          image: docker.io/dpage/pgadmin4:9.17
+          image: docker.io/dpage/pgadmin4:9.18
           command:
             - sh
             - -c
@@ -96,7 +96,7 @@ spec:
               mountPath: /var/lib/pgadmin
       containers:
         - name: pgadmin
-          image: docker.io/dpage/pgadmin4:9.17
+          image: docker.io/dpage/pgadmin4:9.18
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
