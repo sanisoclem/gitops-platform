@@ -85,11 +85,10 @@ replacements:
       fieldPath: data.S3_ENDPOINT
     targets:
       - select:
-          kind: Cluster
+          kind: ObjectStore
           name: zitadel-db
         fieldPaths:
-          - spec.backup.barmanObjectStore.endpointURL
-          - spec.externalClusters.0.barmanObjectStore.endpointURL
+          - spec.configuration.endpointURL
 
   - source:
       kind: ConfigMap

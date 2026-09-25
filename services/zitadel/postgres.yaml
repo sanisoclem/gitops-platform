@@ -1,3 +1,24 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: zitadel-db
+  namespace: zitadel
+spec:
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: s3://backups/zitadel
+    endpointURL: placeholder
+    s3Credentials:
+      accessKeyId:
+        name: s3
+        key: access-key
+      secretAccessKey:
+        name: s3
+        key: secret-key
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -18,19 +39,18 @@ spec:
 
   externalClusters:
     - name: backup
-      barmanObjectStore:
-        destinationPath: s3://backups/zitadel
-        endpointURL: placeholder
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: zitadel-db
+          serverName: zitadel-db-r2
+
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: zitadel-db
         serverName: zitadel-db-r2
-        s3Credentials:
-          accessKeyId:
-            name: s3
-            key: access-key
-          secretAccessKey:
-            name: s3
-            key: secret-key
-        wal:
-          maxParallel: 8
 
   managed:
     roles:
@@ -44,22 +64,6 @@ spec:
 
   monitoring:
     enablePodMonitor: true
-
-  backup:
-    retentionPolicy: 30d
-    barmanObjectStore:
-      destinationPath: s3://backups/zitadel
-      endpointURL: placeholder
-      serverName: zitadel-db-r2
-      s3Credentials:
-        accessKeyId:
-          name: s3
-          key: access-key
-        secretAccessKey:
-          name: s3
-          key: secret-key
-      wal:
-        compression: gzip
 
   resources:
     requests:
@@ -77,6 +81,9 @@ spec:
   schedule: "0 0 3 * * *"
   immediate: true
   backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
   cluster:
     name: zitadel-db
 ---

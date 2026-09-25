@@ -13,6 +13,7 @@ resources:
   - volsync.yaml
   - local-path-provisioner.yaml
   - cloudnative-pg.yaml
+  - plugin-barman-cloud.yaml
   - nginx-gateway-fabric.yaml
   - telepresence.yaml
   - kube-prometheus-stack.yaml

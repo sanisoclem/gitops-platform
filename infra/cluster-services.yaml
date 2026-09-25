@@ -6,7 +6,7 @@ metadata:
   labels:
     hempire.money/app-type: cluster-infra
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/compare-options: ServerSideDiff=true
 spec:
   project: cluster-services
