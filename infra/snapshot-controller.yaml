@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: snapshot-controller
+  namespace: argocd
+  labels:
+    hempire.money/app-type: cluster-infra
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: cluster-services
+  source:
+    repoURL: https://piraeus.io/helm-charts/
+    chart: snapshot-controller
+    targetRevision: 5.3.0
+    helm:
+      valuesObject:
+        controller:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: snapshot-controller
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

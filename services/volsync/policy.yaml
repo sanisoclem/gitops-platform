@@ -1,0 +1,189 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: volsync-block-backed
+spec:
+  rules:
+    - name: restore-from-backup
+      match:
+        any:
+          - resources:
+              kinds: [PersistentVolumeClaim]
+              operations: [CREATE, UPDATE]
+      exclude:
+        any:
+          - resources:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/created-by: volsync
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.storageClassName || '' }}"
+            operator: Equals
+            value: block-backed
+        any:
+          - key: "{{ request.operation == 'CREATE' && !request.object.spec.dataSourceRef }}"
+            operator: Equals
+            value: true
+          - key: "{{ request.oldObject.spec.dataSourceRef.kind || '' }}"
+            operator: Equals
+            value: ReplicationDestination
+      mutate:
+        patchStrategicMerge:
+          spec:
+            dataSourceRef:
+              apiGroup: volsync.backube
+              kind: ReplicationDestination
+              name: "{{ request.object.metadata.name }}"
+
+    - name: allow-privileged-movers
+      match:
+        any:
+          - resources:
+              kinds: [PersistentVolumeClaim]
+              operations: [CREATE]
+      exclude:
+        any:
+          - resources:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/created-by: volsync
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.storageClassName || '' }}"
+            operator: Equals
+            value: block-backed
+      mutate:
+        targets:
+          - apiVersion: v1
+            kind: Namespace
+            name: "{{ request.namespace }}"
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              volsync.backube/privileged-movers: "true"
+
+    - name: restic-repository
+      match:
+        any:
+          - resources:
+              kinds: [PersistentVolumeClaim]
+              operations: [CREATE]
+      exclude:
+        any:
+          - resources:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/created-by: volsync
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.storageClassName || '' }}"
+            operator: Equals
+            value: block-backed
+      context:
+        - name: cluster
+          configMap:
+            name: cluster-services-config
+            namespace: argocd
+      generate:
+        apiVersion: external-secrets.io/v1
+        kind: ExternalSecret
+        name: "{{ request.object.metadata.name }}-restic"
+        namespace: "{{ request.namespace }}"
+        synchronize: true
+        data:
+          spec:
+            refreshInterval: 1h
+            secretStoreRef:
+              name: cluster-secrets
+              kind: ClusterSecretStore
+            target:
+              name: "{{ request.object.metadata.name }}-restic"
+              creationPolicy: Owner
+              template:
+                mergePolicy: Merge
+                data:
+                  RESTIC_REPOSITORY: "s3:{{ cluster.data.S3_ENDPOINT }}/backups/volsync/{{ request.namespace }}/{{ request.object.metadata.name }}"
+            dataFrom:
+              - extract:
+                  key: volsync-restic
+
+    - name: restore-once
+      match:
+        any:
+          - resources:
+              kinds: [PersistentVolumeClaim]
+              operations: [CREATE]
+      exclude:
+        any:
+          - resources:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/created-by: volsync
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.storageClassName || '' }}"
+            operator: Equals
+            value: block-backed
+      generate:
+        apiVersion: volsync.backube/v1alpha1
+        kind: ReplicationDestination
+        name: "{{ request.object.metadata.name }}"
+        namespace: "{{ request.namespace }}"
+        synchronize: true
+        data:
+          spec:
+            trigger:
+              manual: restore-once
+            restic:
+              repository: "{{ request.object.metadata.name }}-restic"
+              copyMethod: Snapshot
+              volumeSnapshotClassName: block-backed
+              storageClassName: block-backed
+              accessModes: "{{ request.object.spec.accessModes }}"
+              capacity: "{{ request.object.spec.resources.requests.storage }}"
+              cacheStorageClassName: block-transient
+              cleanupTempPVC: true
+              cleanupCachePVC: true
+              enableFileDeletion: true
+
+    - name: back-up-hourly
+      match:
+        any:
+          - resources:
+              kinds: [PersistentVolumeClaim]
+              operations: [CREATE]
+      exclude:
+        any:
+          - resources:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/created-by: volsync
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.storageClassName || '' }}"
+            operator: Equals
+            value: block-backed
+      generate:
+        apiVersion: volsync.backube/v1alpha1
+        kind: ReplicationSource
+        name: "{{ request.object.metadata.name }}"
+        namespace: "{{ request.namespace }}"
+        synchronize: true
+        data:
+          spec:
+            sourcePVC: "{{ request.object.metadata.name }}"
+            trigger:
+              schedule: "0 * * * *"
+            restic:
+              repository: "{{ request.object.metadata.name }}-restic"
+              copyMethod: Snapshot
+              volumeSnapshotClassName: block-backed
+              storageClassName: block-backed
+              accessModes: "{{ request.object.spec.accessModes }}"
+              cacheStorageClassName: block-transient
+              pruneIntervalDays: 7
+              retain:
+                hourly: 24
+                daily: 14
+                weekly: 8

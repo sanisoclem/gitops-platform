@@ -21,3 +21,5 @@ data:
   AUTH_JWKS_URI: https://a.k8s.shokugami.place/oauth/v2/keys
 
   S3_ENDPOINT: http://10.11.7.30:30292
+  NAS_HOST: 10.11.7.30
+  NAS_APPS_PATH: /mnt/main/k8s/apps

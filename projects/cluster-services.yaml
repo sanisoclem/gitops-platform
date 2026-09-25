@@ -9,6 +9,7 @@ spec:
     - placeholder
     - ghcr.io/nginx/charts
     - ghcr.io/telepresenceio
+    - https://backube.github.io/helm-charts/
     - https://charts.external-secrets.io
     - https://charts.jetstack.io
     - https://cloudnative-pg.github.io/charts
@@ -20,6 +21,7 @@ spec:
     - https://kubernetes-sigs.github.io/metrics-server/
     - https://kyverno.github.io/kyverno/
     - https://metallb.github.io/metallb
+    - https://piraeus.io/helm-charts/
     - https://prometheus-community.github.io/helm-charts
   destinations:
     - server: https://kubernetes.default.svc

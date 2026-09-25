@@ -8,7 +8,9 @@ resources:
   - metallb.yaml
   - multus.yaml
   - metrics-server.yaml
+  - snapshot-controller.yaml
   - democratic-csi.yaml
+  - volsync.yaml
   - local-path-provisioner.yaml
   - cloudnative-pg.yaml
   - nginx-gateway-fabric.yaml

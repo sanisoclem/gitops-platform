@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: volsync
+  namespace: argocd
+  labels:
+    hempire.money/app-type: cluster-infra
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: cluster-services
+  source:
+    repoURL: https://backube.github.io/helm-charts/
+    chart: volsync
+    targetRevision: 0.16.0
+    helm:
+      valuesObject:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: volsync-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
