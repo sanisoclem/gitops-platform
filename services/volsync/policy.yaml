@@ -9,7 +9,7 @@ spec:
         any:
           - resources:
               kinds: [PersistentVolumeClaim]
-              operations: [CREATE, UPDATE]
+              operations: [CREATE]
       exclude:
         any:
           - resources:
@@ -21,10 +21,34 @@ spec:
           - key: "{{ request.object.spec.storageClassName || '' }}"
             operator: Equals
             value: block-backed
-        any:
-          - key: "{{ request.operation == 'CREATE' && !request.object.spec.dataSourceRef }}"
+          - key: "{{ request.object.spec.dataSourceRef.kind || '' }}"
             operator: Equals
-            value: true
+            value: ""
+      mutate:
+        patchStrategicMerge:
+          spec:
+            dataSourceRef:
+              apiGroup: volsync.backube
+              kind: ReplicationDestination
+              name: "{{ request.object.metadata.name }}"
+
+    - name: keep-restore-source
+      match:
+        any:
+          - resources:
+              kinds: [PersistentVolumeClaim]
+              operations: [UPDATE]
+      exclude:
+        any:
+          - resources:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/created-by: volsync
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.storageClassName || '' }}"
+            operator: Equals
+            value: block-backed
           - key: "{{ request.oldObject.spec.dataSourceRef.kind || '' }}"
             operator: Equals
             value: ReplicationDestination
