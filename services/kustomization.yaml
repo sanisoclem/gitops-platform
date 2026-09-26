@@ -70,6 +70,34 @@ replacements:
   - source:
       kind: ConfigMap
       name: cluster-services-config
+      fieldPath: data.S3_BACKUP_BUCKET
+    targets:
+      - select:
+          kind: ObjectStore
+          name: zitadel-db
+        fieldPaths:
+          - spec.configuration.destinationPath
+        options:
+          delimiter: '/'
+          index: 2
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
+      fieldPath: data.GITHUB_ORG
+    targets:
+      - select:
+          kind: ConfigMap
+          name: argocd-cm
+        fieldPaths:
+          - data.dex\.config
+        options:
+          delimiter: 'name: '
+          index: 2
+
+  - source:
+      kind: ConfigMap
+      name: cluster-services-config
       fieldPath: data.DNS_ZONE
     targets:
       - select:

@@ -107,3 +107,14 @@ replacements:
         options:
           delimiter: '.'
           index: 1
+
+  - source:
+      kind: ConfigMap
+      name: cluster-config
+      fieldPath: data.GITHUB_ORG
+    targets:
+      - select:
+          kind: Application
+          name: kube-prometheus-stack
+        fieldPaths:
+          - spec.source.helm.valuesObject.grafana.grafana\.ini.auth\.github.allowed_organizations

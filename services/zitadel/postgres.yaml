@@ -6,7 +6,7 @@ metadata:
 spec:
   retentionPolicy: 30d
   configuration:
-    destinationPath: s3://backups/zitadel
+    destinationPath: s3://placeholder/zitadel
     endpointURL: placeholder
     s3Credentials:
       accessKeyId:

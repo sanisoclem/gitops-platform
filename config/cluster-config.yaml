@@ -21,3 +21,4 @@ data:
   AUTH_JWKS_URI: https://a.k8s.shokugami.place/oauth/v2/keys
 
   S3_ENDPOINT: http://10.11.7.30:30292
+  S3_BACKUP_BUCKET: backups

@@ -103,7 +103,7 @@ spec:
               template:
                 mergePolicy: Merge
                 data:
-                  RESTIC_REPOSITORY: "s3:{{ cluster.data.S3_ENDPOINT }}/backups/volsync/{{ request.namespace }}/{{ request.object.metadata.name }}"
+                  RESTIC_REPOSITORY: "s3:{{ cluster.data.S3_ENDPOINT }}/{{ cluster.data.S3_BACKUP_BUCKET }}/volsync/{{ request.namespace }}/{{ request.object.metadata.name }}"
             dataFrom:
               - extract:
                   key: volsync-restic
