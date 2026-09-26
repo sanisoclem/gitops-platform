@@ -78,6 +78,8 @@ spec:
         volumeSnapshotClasses:
           - name: block-backed
             deletionPolicy: Delete
+            parameters:
+              detachedSnapshots: "false"
         node:
           hostPID: true
   destination:
