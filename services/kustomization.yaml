@@ -17,7 +17,6 @@ resources:
   - pgadmin
   - renovate
   - volsync
-  - nas-config-backup
 
 patches:
   - target:
@@ -45,28 +44,6 @@ replacements:
         fieldPaths:
           - spec.template.spec.containers.[name=pgadmin].env.[name=PGADMIN_DEFAULT_EMAIL].value
           - spec.template.spec.initContainers.[name=seed].env.[name=PGADMIN_DEFAULT_EMAIL].value
-
-  - source:
-      kind: ConfigMap
-      name: cluster-services-config
-      fieldPath: data.NAS_HOST
-    targets:
-      - select:
-          kind: CronJob
-          name: nas-config-backup
-        fieldPaths:
-          - spec.jobTemplate.spec.template.spec.volumes.[name=apps].nfs.server
-
-  - source:
-      kind: ConfigMap
-      name: cluster-services-config
-      fieldPath: data.NAS_APPS_PATH
-    targets:
-      - select:
-          kind: CronJob
-          name: nas-config-backup
-        fieldPaths:
-          - spec.jobTemplate.spec.template.spec.volumes.[name=apps].nfs.path
 
   - source:
       kind: ConfigMap
