@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: democratic-csi-iscsi
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   labels:
     hempire.money/app-type: cluster-infra
   annotations:
@@ -138,6 +140,8 @@ kind: Application
 metadata:
   name: democratic-csi-nfs
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   labels:
     hempire.money/app-type: cluster-infra
   annotations:
