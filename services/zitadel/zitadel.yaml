@@ -18,7 +18,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: zitadel
-          image: ghcr.io/zitadel/zitadel:v4.19.1
+          image: ghcr.io/zitadel/zitadel:v4.19.4
           args:
             - start-from-init
             - --masterkeyFromEnv
