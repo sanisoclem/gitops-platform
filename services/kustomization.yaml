@@ -15,6 +15,7 @@ resources:
   - argocd
   - monitoring
   - pgadmin
+  - registry
   - renovate
   - volsync
 
