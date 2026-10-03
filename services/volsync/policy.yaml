@@ -163,7 +163,7 @@ spec:
               repository: "{{ request.object.metadata.name }}-restic"
               copyMethod: Snapshot
               volumeSnapshotClassName: block-backed
-              storageClassName: block-backed
+              storageClassName: block-backed-ephemeral
               accessModes: "{{ request.object.spec.accessModes }}"
               capacity: "{{ request.object.spec.resources.requests.storage }}"
               cacheStorageClassName: block-transient
@@ -203,7 +203,7 @@ spec:
               repository: "{{ request.object.metadata.name }}-restic"
               copyMethod: Snapshot
               volumeSnapshotClassName: block-backed
-              storageClassName: block-backed
+              storageClassName: block-backed-ephemeral
               accessModes: "{{ request.object.spec.accessModes }}"
               cacheStorageClassName: block-transient
               pruneIntervalDays: 7
