@@ -62,14 +62,14 @@ spec:
               mountPath: /var/lib/zot
           readinessProbe:
             httpGet:
-              path: /v2/
+              path: /readyz
               port: 5000
               scheme: HTTPS
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /v2/
+              path: /livez
               port: 5000
               scheme: HTTPS
             initialDelaySeconds: 30
