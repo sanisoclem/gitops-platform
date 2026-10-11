@@ -17,6 +17,23 @@ spec:
       values: |
         serviceMonitor:
           enabled: true
+        priorityClassName: system-cluster-critical
+        resources:
+          requests:
+            cpu: 55m
+            memory: 240Mi
+        certController:
+          priorityClassName: system-cluster-critical
+          resources:
+            requests:
+              cpu: 40m
+              memory: 208Mi
+        webhook:
+          priorityClassName: system-cluster-critical
+          resources:
+            requests:
+              cpu: 50m
+              memory: 160Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: external-secrets

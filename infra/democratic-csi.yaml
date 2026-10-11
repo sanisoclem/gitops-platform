@@ -41,8 +41,54 @@ spec:
             deletionPolicy: Delete
             parameters:
               detachedSnapshots: "false"
+        controller:
+          driver:
+            resources:
+              requests:
+                cpu: 15m
+                memory: 176Mi
+          externalAttacher:
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+          externalProvisioner:
+            resources:
+              requests:
+                cpu: 20m
+                memory: 64Mi
+          externalResizer:
+            resources:
+              requests:
+                cpu: 10m
+                memory: 80Mi
+          externalSnapshotter:
+            resources:
+              requests:
+                cpu: 60m
+                memory: 80Mi
         node:
           hostPID: true
+          driver:
+            resources:
+              requests:
+                cpu: 35m
+                memory: 176Mi
+          driverRegistrar:
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+          cleanup:
+            resources:
+              requests:
+                cpu: 5m
+                memory: 16Mi
+        csiProxy:
+          resources:
+            requests:
+              cpu: 15m
+              memory: 32Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: democratic-csi
@@ -85,8 +131,54 @@ spec:
             allowVolumeExpansion: true
             parameters:
               fsType: ext4
+        controller:
+          driver:
+            resources:
+              requests:
+                cpu: 15m
+                memory: 176Mi
+          externalAttacher:
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+          externalProvisioner:
+            resources:
+              requests:
+                cpu: 20m
+                memory: 64Mi
+          externalResizer:
+            resources:
+              requests:
+                cpu: 10m
+                memory: 80Mi
+          externalSnapshotter:
+            resources:
+              requests:
+                cpu: 60m
+                memory: 80Mi
         node:
           hostPID: true
+          driver:
+            resources:
+              requests:
+                cpu: 35m
+                memory: 176Mi
+          driverRegistrar:
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+          cleanup:
+            resources:
+              requests:
+                cpu: 5m
+                memory: 16Mi
+        csiProxy:
+          resources:
+            requests:
+              cpu: 15m
+              memory: 32Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: democratic-csi

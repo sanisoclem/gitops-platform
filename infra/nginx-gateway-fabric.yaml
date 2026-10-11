@@ -18,6 +18,17 @@ spec:
         nginxGateway:
           gwAPIExperimentalFeatures:
             enable: true
+          priorityClassName: system-cluster-critical
+          resources:
+            requests:
+              cpu: 30m
+              memory: 128Mi
+        nginx:
+          container:
+            resources:
+              requests:
+                cpu: 95m
+                memory: 96Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: nginx-gateway

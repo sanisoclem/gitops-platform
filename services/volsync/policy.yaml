@@ -170,6 +170,12 @@ spec:
               cleanupTempPVC: true
               cleanupCachePVC: true
               enableFileDeletion: true
+              moverResources:
+                requests:
+                  cpu: 10m
+                  memory: 128Mi
+                limits:
+                  memory: 1Gi
 
     - name: back-up-hourly
       match:
@@ -211,3 +217,9 @@ spec:
                 hourly: 24
                 daily: 14
                 weekly: 8
+              moverResources:
+                requests:
+                  cpu: 10m
+                  memory: 128Mi
+                limits:
+                  memory: 1Gi

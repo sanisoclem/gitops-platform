@@ -16,21 +16,46 @@ spec:
     helm:
       valuesObject:
         controller:
+          priorityClassName: system-cluster-critical
           resources:
             requests:
-              cpu: 10m
-              memory: 128Mi
-            limits:
-              memory: 256Mi
+              cpu: 65m
+              memory: 224Mi
         speaker:
+          priorityClassName: system-node-critical
           frr:
             enabled: false
           resources:
             requests:
-              cpu: 10m
-              memory: 64Mi
-            limits:
-              memory: 128Mi
+              cpu: 190m
+              memory: 112Mi
+        frr-k8s:
+          frrk8s:
+            priorityClassName: system-node-critical
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+            frr:
+              resources:
+                requests:
+                  cpu: 110m
+                  memory: 64Mi
+            reloader:
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+            frrMetrics:
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 80Mi
+            frrStatus:
+              resources:
+                requests:
+                  cpu: 20m
+                  memory: 80Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system

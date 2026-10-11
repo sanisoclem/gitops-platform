@@ -19,6 +19,12 @@ spec:
           - env-test
         usage:
           enabled: false
+        resources:
+          requests:
+            cpu: 45m
+            memory: 112Mi
+          limits:
+            memory: 256Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: ambassador

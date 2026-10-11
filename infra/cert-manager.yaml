@@ -17,9 +17,25 @@ spec:
       values: |
         crds:
           enabled: true
+        global:
+          priorityClassName: system-cluster-critical
         prometheus:
           servicemonitor:
             enabled: true
+        resources:
+          requests:
+            cpu: 40m
+            memory: 128Mi
+        cainjector:
+          resources:
+            requests:
+              cpu: 15m
+              memory: 128Mi
+        webhook:
+          resources:
+            requests:
+              cpu: 55m
+              memory: 80Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
