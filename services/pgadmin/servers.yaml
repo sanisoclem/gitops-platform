@@ -7,26 +7,6 @@ data:
   servers.json: |
     {
       "Servers": {
-        "1": {
-          "Name": "hempire prod",
-          "Group": "hempire",
-          "Host": "hempire-db-rw.env-prod.svc.cluster.local",
-          "Port": 5432,
-          "MaintenanceDB": "postgres",
-          "Username": "hempire",
-          "SSLMode": "prefer",
-          "PassFile": "/.pgpass"
-        },
-        "2": {
-          "Name": "hempire test",
-          "Group": "hempire",
-          "Host": "hempire-db-rw.env-test.svc.cluster.local",
-          "Port": 5432,
-          "MaintenanceDB": "postgres",
-          "Username": "hempire",
-          "SSLMode": "prefer",
-          "PassFile": "/.pgpass"
-        },
         "3": {
           "Name": "zitadel",
           "Group": "platform",

@@ -15,7 +15,6 @@ resources:
   - cloudnative-pg.yaml
   - plugin-barman-cloud.yaml
   - nginx-gateway-fabric.yaml
-  - telepresence.yaml
   - kube-prometheus-stack.yaml
   - loki.yaml
   - tempo.yaml
